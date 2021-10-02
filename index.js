@@ -46,24 +46,122 @@ var user2 = {
   ],
 };
 
+const users = {
+  user1,
+  user2,
+};
+
 const main = document.querySelector('main');
-const navHandleH1 = document.getElementById('nav-handle')
-const navNumberOfTweetsH4 = document.getElementById('nav-number-of-tweets')
-const heroBannerImg = document.getElementById('hero-banner')
-const avatarImg = document.getElementById('avatar')
-const profileNameH2 = document.getElementById('profile-name')
-const profileHandleSpan = document.getElementById('profile-handle')
-const joinDateSpan = document.getElementById('join-date')
-const followingCountSpan = document.getElementById('following-count')
-const followerCountSpan = document.getElementById('follower-count')
-const tweetAvatarImg = document.getElementById('tweet-avatar')
-const tweetProfileNameH3 = document.getElementById('tweet-profile-name')
-const tweetProfileHandleSpan = document.getElementById('tweet-profile-handle')
-const tweetProfileDateSpan = document.getElementById('tweet-profile-date')
-const tweetTextParagraph = document.getElementById('tweet-text')
+
+// get the selected user based on the query string
+const urlSearchParams = new URLSearchParams(window.location.search);
+const params = Object.fromEntries(urlSearchParams.entries());
+const selectedUser = users[params['user']];
+
+// utility functions
+const numFormatter = (num) => {
+  if (num > 999 && num < 1000000) {
+    return (num / 1000).toFixed(0) + 'K'; // convert to K for number from > 1000 < 1 million
+  } else if (num > 1000000) {
+    return (num / 1000000).toFixed(0) + 'M'; // convert to M for number from > 1 million
+  } else if (num < 900) {
+    return num; // if value < 1000, nothing to do
+  }
+};
 
 // setup the main HTML element
+main.innerHTML = `
+<div class="nav">
+        <div class="nav-back-div">
+          <i class="fas fa-arrow-left"></i>
+        </div>
 
-// main.innerHTML = `
+        <div class="nav-handle-div">
+            <div>
+                <h1>${selectedUser.displayName}</h1>
+                <i class="fas fa-check-circle"></i>
+            </div>
+          <h4 class="gray">${selectedUser.tweets.length} Tweets</h4>
+        </div>
+      </div>
 
-// `;
+      <div class="hero-div">
+        <img src="${selectedUser.coverPhotoURL}" alt="hero" />
+      </div>
+
+      <div class="avatar-following-div">
+        <div class="floating-div">
+          <img src="${selectedUser.avatarURL}" alt="avatar" />
+          <button>Following</button>
+        </div>
+      </div>
+
+      <div class="user-info-div">
+        <div>
+          <h2>${selectedUser.displayName}</h2>
+          <i class="fas fa-check-circle verified"></i>
+        </div>
+        <div>
+          <span class="gray">${selectedUser.userName}</span>
+        </div>
+        <div>
+          <i class="fas fa-calendar calendar"></i>
+          <span class="gray">Joined ${selectedUser.joinedDate}</span>
+        </div>
+        <span class="bold">${numFormatter(selectedUser.followingCount)}</span>
+        <span class="gray">Following</span>
+        <span class="bold">${numFormatter(selectedUser.followerCount)}</span>
+        <span class="gray">Followers</span>
+      </div>
+
+      <div class="tab-div">
+        <button class="tab active">Tweets</button>
+        <button class="tab">Tweets & replies</button>
+        <button class="tab">Media</button>
+        <button class="tab">Likes</button>
+      </div>
+
+      ${selectedUser.tweets
+        .map((tweet) => {
+          return `
+         <div class="tweet-div">
+        <div class="avatar-div">
+          <img src="${selectedUser.avatarURL}" alt="avatar" />
+        </div>
+
+        <div class="content-div">
+          <div class="upper-div">
+            <h3>${selectedUser.displayName}</h3>
+            <i class="fas fa-check-circle"></i>
+            <span class="gray">${selectedUser.userName}</span>
+            <span class="gray">${new Date(
+              tweet.timestamp
+            ).toLocaleDateString()}</span>
+            <i class="fas fa-ellipsis-h"></i>
+          </div>
+          <div class="text-div">
+            <p>${tweet.text}</p>
+          </div>
+          <div class="stats-div">
+            <div>
+              <i class="far fa-comment"></i>
+              <span class="gray">5.2k</span>
+            </div>
+            <div>
+              <i class="fas fa-retweet"></i>
+              <span class="gray">5.2k</span>
+            </div>
+            <div>
+              <i class="far fa-heart"></i>
+              <span class="gray">5.2k</span>
+            </div>
+            <div>
+              <i class="fas fa-share-alt"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+         `;
+        })
+        .join('')}
+`;
